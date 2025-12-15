@@ -25,7 +25,7 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 
 // #include <stdlib.h>
-// #include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <stdarg.h>
@@ -167,12 +167,14 @@ void I_Error (char *error, ...)
 
     // Message first.
     va_start (argptr,error);
-    // fprintf (stderr, "Error: ");
-    // vfprintf (stderr,error,argptr);
-    // fprintf (stderr, "\n");
+    printf ("Error: ");
+    vprintf (error, argptr);
+    printf ("\n");
     va_end (argptr);
 
     // fflush( stderr );
+
+    for(;;);
 
     // Shutdown. Here might be other errors.
     if (demorecording)

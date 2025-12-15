@@ -25,7 +25,7 @@ static const char
 rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 
 #include <string.h>
-// #include <stdlib.h>
+#include <stdio.h>
 
 #include "doomdef.h" 
 #include "doomstat.h"
@@ -120,7 +120,7 @@ player_t        players[MAXPLAYERS];
  
 int             consoleplayer;          // player taking events and displaying 
 int             displayplayer;          // view being displayed 
-int             gametic; 
+int             gametic=0; 
 int             levelstarttic;          // gametic at level start 
 int             totalkills, totalitems, totalsecret;    // for intermission 
  
@@ -613,12 +613,13 @@ void G_Ticker (void)
 	if (playeringame[i] && players[i].playerstate == PST_REBORN) 
 	    G_DoReborn (i);
     
+    
     // do things to change the game state
     while (gameaction != ga_nothing) 
     { 
 	switch (gameaction) 
 	{ 
-	  case ga_loadlevel: 
+	  case ga_loadlevel:
 	    G_DoLoadLevel (); 
 	    break; 
 	  case ga_newgame: 
@@ -650,17 +651,19 @@ void G_Ticker (void)
 	    break; 
 	} 
     }
+
     
     // get commands, check consistancy,
     // and build new consistancy check
+    if (ticdup == 0) ticdup = 1;
     buf = (gametic/ticdup)%BACKUPTICS; 
+
  
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
 	if (playeringame[i]) 
 	{ 
-	    cmd = &players[i].cmd; 
- 
+	    cmd = &players[i].cmd;
 	    memcpy (cmd, &netcmds[i][buf], sizeof(ticcmd_t)); 
  
 	    if (demoplayback) 
@@ -1588,7 +1591,7 @@ void G_DoPlayDemo (void)
     demobuffer = demo_p = W_CacheLumpName (defdemoname, PU_STATIC); 
     if ( *demo_p++ != VERSION)
     {
-      fprintf( stderr, "Demo is from a different game version!\n");
+      printf("Demo is from a different game version!\n");
       gameaction = ga_nothing;
       return;
     }

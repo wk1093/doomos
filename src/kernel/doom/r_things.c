@@ -26,7 +26,7 @@ static const char
 rcsid[] = "$Id: r_things.c,v 1.5 1997/02/03 16:47:56 b1 Exp $";
 
 
-// #include <stdio.h>
+#include <stdio.h>
 // #include <stdlib.h>
 
 
@@ -126,8 +126,8 @@ R_InstallSpriteLump
 		     "multip rot=0 lump", spritename, 'A'+frame);
 
 	if (sprtemp[frame].rotate == true)
-	    I_Error ("R_InitSprites: Sprite %s frame %c has rotations "
-		     "and a rot=0 lump", spritename, 'A'+frame);
+	    I_Error ("R_InitSprites: Sprite %s frame %d has rotations "
+		     "and a rot=0 lump", spritename, frame);
 			
 	sprtemp[frame].rotate = false;
 	for (r=0 ; r<8 ; r++)

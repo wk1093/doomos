@@ -63,6 +63,10 @@ FixedDiv
 {
     if ( (abs(a)>>14) >= abs(b))
 	return (a^b)<0 ? MININT : MAXINT;
+    // block divide by zero
+    if (b == 0)
+    I_Error("FixedDiv: divide by zero");
+
     return FixedDiv2 (a,b);
 }
 
@@ -80,7 +84,8 @@ FixedDiv2
 #endif
 
     double c;
-
+    if (b == 0)
+    I_Error("FixedDiv: divide by zero");
     c = ((double)a) / ((double)b) * FRACUNIT;
 
     if (c >= 2147483648.0 || c < -2147483648.0)

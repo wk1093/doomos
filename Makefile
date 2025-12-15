@@ -6,9 +6,15 @@ CC      = i386-elf-gcc
 LD      = i386-elf-ld
 OBJCOPY = i386-elf-objcopy
 AS      = nasm
-CFLAGS  = -m32 -ffreestanding -O2 -Wall -Wextra -nostdlib -I src/drivers -I src/kernel -I src/libc \
+CFLAGS  = -m32 -ffreestanding -Wall -Wextra -nostdlib -I src/drivers -I src/kernel -I src/libc \
  -fno-exceptions -fno-stack-protector -fomit-frame-pointer -fno-builtin -Wno-incompatible-pointer-types -Wno-unused-parameter
 LDFLAGS = -T linker.ld
+
+ifneq (,$(filter debug,$(MAKECMDGOALS)))
+	CFLAGS += -g -DDEBUG -O0
+else
+	CFLAGS += -O2
+endif
 
 SRC     = $(wildcard src/kernel/*.c src/drivers/*.c src/libc/*.c src/kernel/**/*.c)
 ASM     = $(wildcard src/kernel/*.asm src/kernel/**/*.asm)
@@ -46,8 +52,17 @@ $(ISO): $(KERNEL_ELF)
 run: $(ISO)
 	qemu-system-i386 -cdrom $(ISO)
 
+kvm: $(ISO)
+	qemu-system-i386 -cdrom $(ISO) -enable-kvm
+
 debug: $(ISO)
 	qemu-system-i386 -cdrom $(ISO) -S -gdb tcp::1234
+
+debugkvm: $(ISO)
+	qemu-system-i386 -cdrom $(ISO) -enable-kvm -S -gdb tcp::1234
+
+debug_cmd: $(ISO)
+	gdb $(KERNEL_ELF) -ex "target remote localhost:1234" -ex "symbol-file $(KERNEL_ELF)"
 
 clean:
 	rm -rf $(BUILD)

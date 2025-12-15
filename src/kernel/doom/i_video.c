@@ -26,6 +26,7 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include <kbd.h>
 #include <framebuffer.h>
+#include <stdio.h>
 
 // #include <stdlib.h>
 // #include <unistd.h>
@@ -356,7 +357,6 @@ void I_FinishUpdate (void)
   	Expand4 ((unsigned *)(screens[0]), (double *) (image->data));
     }
     {
-
 	fb_draw_image();
 	fb_swap();
 
@@ -534,6 +534,9 @@ void I_SetPalette (byte* palette)
 
 void I_InitGraphics(void)
 {
+	fb_clear(0x00000000);
+
+	screens[0] = image->data;
 
     // char*		displayname;
     // char*		d;
@@ -747,7 +750,8 @@ void I_InitGraphics(void)
     // else
 	// screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
 
-	fb_init(FB_DOUBLE_BUFFER);
+	// fb_init(FB_DOUBLE_BUFFER);
+
 
 }
 

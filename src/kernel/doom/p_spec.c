@@ -52,6 +52,8 @@ rcsid[] = "$Id: p_spec.c,v 1.6 1997/02/03 22:45:12 b1 Exp $";
 // Data.
 #include "sounds.h"
 
+#include <stdio.h>
+
 
 //
 // Animating textures and planes
@@ -72,7 +74,7 @@ typedef struct
 //
 typedef struct
 {
-    boolean	istexture;	// if false, it is a flat
+    int	istexture;	// if false, it is a flat
     char	endname[9];
     char	startname[9];
     int		speed;
@@ -128,7 +130,7 @@ animdef_t		animdefs[] =
     {true,	"WFALL4",	"WFALL1",	8},
     {true,	"DBRAIN4",	"DBRAIN1",	8},
 	
-    {-1}
+    {-1, "0", "0", -1},
 };
 
 anim_t		anims[MAXANIMS];
@@ -354,8 +356,8 @@ P_FindNextHighestFloor
 	// Check for overflow. Exit.
 	if ( h >= MAX_ADJOINING_SECTORS )
 	{
-	    // fprintf( stderr,
-		//      "Sector with more than 20 adjoining sectors\n" );
+	    printf(
+		     "Sector with more than 20 adjoining sectors\n" );
 	    break;
 	}
     }

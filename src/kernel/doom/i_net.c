@@ -25,7 +25,7 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 // #include <stdlib.h>
 #include <string.h>
-// #include <stdio.h>
+#include <stdio.h>
 
 #include "i_system.h"
 #include "d_event.h"
@@ -124,7 +124,54 @@ int GetLocalAddress (void)
 //
 void I_InitNetwork (void)
 {
+        boolean		trueval = true;
+    int			i;
+    int			p;
+    struct hostent*	hostentry;	// host information entry
+	
+    doomcom = malloc (sizeof (*doomcom) );
+    memset (doomcom, 0, sizeof(*doomcom) );
     
+    // set up for network
+    i = M_CheckParm ("-dup");
+    if (i && i< myargc-1)
+    {
+	doomcom->ticdup = myargv[i+1][0]-'0';
+	if (doomcom->ticdup < 1)
+	    doomcom->ticdup = 1;
+	if (doomcom->ticdup > 9)
+	    doomcom->ticdup = 9;
+    }
+    else
+	doomcom-> ticdup = 1;
+	
+    if (M_CheckParm ("-extratic"))
+	doomcom-> extratics = 1;
+    else
+	doomcom-> extratics = 0;
+		
+    p = M_CheckParm ("-port");
+    if (p && p<myargc-1)
+    {
+	DOOMPORT = atoi (myargv[p+1]);
+	printf ("using alternate port %i\n",DOOMPORT);
+    }
+    
+    // parse network game options,
+    //  -net <consoleplayer> <host> <host> ...
+    i = M_CheckParm ("-net");
+    if (!i)
+    {
+	// single player game
+	netgame = false;
+	doomcom->id = DOOMCOM_ID;
+	doomcom->numplayers = doomcom->numnodes = 1;
+	doomcom->deathmatch = false;
+	doomcom->consoleplayer = 0;
+	return;
+    }
+
+    I_Error("Network game not supported in this build");
 }
 
 

@@ -2,9 +2,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define stderr 0
-#define stdout 0
-
 void *memcpy(void *dst, const void *src, size_t n);
 void *memset(void *dst, int value, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);
@@ -17,10 +14,6 @@ int atoi(const char *str);
 void strcpy(char *dst, const char *src);
 
 void* malloc(size_t size);
-
-void printf(const char *fmt, ...);
-
-void fprintf(int fd, const char *fmt, ...);
 
 char toupper(char c);
 char tolower(char c);
@@ -37,7 +30,9 @@ int strcasecmp(const char *s1, const char *s2);
 #define MININT (-2147483647-1)
 #define MAXINT 2147483647
 
-int abs(int x);
+inline static int abs(int x) {
+    return (x < 0) ? -x : x;
+}
 
 void strncpy(char *dst, const char *src, size_t n);
 

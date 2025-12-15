@@ -40,6 +40,8 @@ static const char rcsid[] = "$Id: r_main.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #include "r_local.h"
 #include "r_sky.h"
 
+#include <stdio.h>
+
 
 
 
@@ -664,7 +666,6 @@ R_SetViewSize
     setdetail = detail;
 }
 
-
 //
 // R_ExecuteSetViewSize
 //
@@ -715,8 +716,8 @@ void R_ExecuteSetViewSize (void)
     }
 
     R_InitBuffer (scaledviewwidth, viewheight);
-	
     R_InitTextureMapping ();
+
     
     // psprite scales
     pspritescale = FRACUNIT*viewwidth/SCREENWIDTH;
@@ -725,7 +726,7 @@ void R_ExecuteSetViewSize (void)
     // thing clipping
     for (i=0 ; i<viewwidth ; i++)
 	screenheightarray[i] = viewheight;
-    
+
     // planes
     for (i=0 ; i<viewheight ; i++)
     {
@@ -733,13 +734,13 @@ void R_ExecuteSetViewSize (void)
 	dy = abs(dy);
 	yslope[i] = FixedDiv ( (viewwidth<<detailshift)/2*FRACUNIT, dy);
     }
-	
+
     for (i=0 ; i<viewwidth ; i++)
     {
 	cosadj = abs(finecosine[xtoviewangle[i]>>ANGLETOFINESHIFT]);
 	distscale[i] = FixedDiv (FRACUNIT,cosadj);
     }
-    
+
     // Calculate the light levels to use
     //  for each level / scale combination.
     for (i=0 ; i< LIGHTLEVELS ; i++)
@@ -772,6 +773,7 @@ extern int	screenblocks;
 
 void R_Init (void)
 {
+    printf("R_Init started\n");
     R_InitData ();
     printf ("\nR_InitData");
     R_InitPointToAngle ();

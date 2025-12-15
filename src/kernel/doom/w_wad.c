@@ -51,6 +51,7 @@ rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 
 
 #include <string.h>
+#include <stdio.h>
 
 
 //
@@ -156,10 +157,10 @@ int wadread(void* buffer, int length)
 {
     if (wadPosition + length > DOOM_WAD_len)
     {
-        I_Error("wadread: read exceeds wad size");
+        I_Error("wadread: read beyond end of WAD");
     }
     
-    memcpy(buffer, DOOM_WAD + wadPosition, length);
+    memcpy(buffer, &DOOM_WAD[wadPosition], length);
     wadPosition += length;
     return length;
 }
@@ -178,7 +179,7 @@ void W_AddFile (char *filename)
     int			storehandle;
     
     // open the file and add to directory
-
+    wadseek(0);
     // handle reload indicator.
     if (filename[0] == '~')
     {
@@ -193,6 +194,7 @@ void W_AddFile (char *filename)
 	
     if (strcmpi (filename+strlen(filename)-3 , "wad" ) )
     {
+        // printf("Single lump file detected\n");
 	// single lump file
 	fileinfo = &singleinfo;
 	singleinfo.filepos = 0;
@@ -212,9 +214,12 @@ void W_AddFile (char *filename)
 		I_Error ("Wad file %s doesn't have IWAD "
 			 "or PWAD id\n", filename);
 	    }
+
+        printf("NOT IWAD\n");
 	    
 	    // ???modifiedgame = true;		
 	}
+    printf("Header identification: %s\n", header.identification);
 	header.numlumps = LONG(header.numlumps);
 	header.infotableofs = LONG(header.infotableofs);
 	length = header.numlumps*sizeof(filelump_t);

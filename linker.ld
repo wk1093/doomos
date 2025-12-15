@@ -1,5 +1,5 @@
 /* The address where the kernel will be loaded (1MB) */
-ENTRY(kernel_main)
+ENTRY(_start)
 LOAD_ADDR = 0x00100000;
 
 SECTIONS
@@ -8,16 +8,13 @@ SECTIONS
   . = LOAD_ADDR;
 
   /* Multiboot header section */
-  .multiboot ALIGN(8) :
-  {
-    *(.multiboot)
-  }
 
-  . = 0x00101000;
+  . = 0x00100000;
 
   /* Text section (code) */
   .text :
   {
+    KEEP(*(.multiboot))
     *(.text)
   }
   .rodata : { *(.rodata*) }
@@ -42,4 +39,9 @@ SECTIONS
         *(.risc.attributes)
         *(.stack_metadata)
     }
+
+    . = ALIGN(16);
+    stack_bottom = .;
+    . += 0x4000; /* 16KB stack */
+    stack_top = .;
 }

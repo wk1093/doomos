@@ -405,7 +405,18 @@ void HU_Init(void)
     j = HU_FONTSTART;
     for (i=0;i<HU_FONTSIZE;i++)
     {
-	sprintf(buffer, "STCFN%.3d", j++);
+	// sprintf(buffer, "STCFN%.3d", j++);
+    // my implementation of sprintf doesn't support precision or width
+    // so we do it manually
+    buffer[0] = 'S';
+    buffer[1] = 'T';
+    buffer[2] = 'C';
+    buffer[3] = 'F';
+    buffer[4] = 'N';
+    buffer[5] = '0' + (j / 100) % 10;
+    buffer[6] = '0' + (j / 10) % 10;
+    buffer[7] = '0' + (j % 10);
+    buffer[8] = '\0';
 	hu_font[i] = (patch_t *) W_CacheLumpName(buffer, PU_STATIC);
     }
 

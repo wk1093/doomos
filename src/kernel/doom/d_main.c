@@ -77,6 +77,8 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 
 #include "d_main.h"
 
+#include <stdio.h>
+
 //
 // D-DoomLoop()
 // Not a globally visible function,
@@ -99,7 +101,7 @@ boolean         fastparm;	// checkparm of -fast
 
 boolean         drone;
 
-boolean		singletics = false; // debug flag to cancel adaptiveness
+boolean		singletics = true; // debug flag to cancel adaptiveness
 
 
 
@@ -211,7 +213,6 @@ void D_Display (void)
 	return;                    // for comparative timing / profiling
 		
     redrawsbar = false;
-    
     // change the view size if needed
     if (setsizeneeded)
     {
@@ -228,6 +229,7 @@ void D_Display (void)
     }
     else
 	wipe = false;
+
 
     if (gamestate == GS_LEVEL && gametic)
 	HU_Erase();
@@ -387,11 +389,12 @@ void D_DoomLoop (void)
 	}
 	else
 	{
+		printf("Multi tic mode\n");
+		for (;;);
 	    TryRunTics (); // will run at least one tic
 	}
 		
 	S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
-
 	// Update display, next frame, with current state.
 	D_Display ();
 
@@ -549,6 +552,8 @@ void D_AddFile (char *file)
     for (numwadfiles = 0 ; wadfiles[numwadfiles] ; numwadfiles++)
 	;
 
+	printf("Adding file: %s\n", file);
+
     newfile = malloc (strlen(file)+1);
     strcpy (newfile, file);
 	
@@ -615,49 +620,49 @@ void IdentifyVersion (void)
     sprintf(basedefault, "%s/.doomrc", home);
 #endif
 
-    if (M_CheckParm ("-shdev"))
-    {
-	gamemode = shareware;
-	devparm = true;
-	D_AddFile (DEVDATA"doom1.wad");
-	D_AddFile (DEVMAPS"data_se/texture1.lmp");
-	D_AddFile (DEVMAPS"data_se/pnames.lmp");
-	strcpy (basedefault,DEVDATA"default.cfg");
-	return;
-    }
+    // if (M_CheckParm ("-shdev"))
+    // {
+	// gamemode = shareware;
+	// devparm = true;
+	// D_AddFile (DEVDATA"doom1.wad");
+	// D_AddFile (DEVMAPS"data_se/texture1.lmp");
+	// D_AddFile (DEVMAPS"data_se/pnames.lmp");
+	// strcpy (basedefault,DEVDATA"default.cfg");
+	// return;
+    // }
 
-    if (M_CheckParm ("-regdev"))
-    {
-	gamemode = registered;
-	devparm = true;
-	D_AddFile (DEVDATA"doom.wad");
-	D_AddFile (DEVMAPS"data_se/texture1.lmp");
-	D_AddFile (DEVMAPS"data_se/texture2.lmp");
-	D_AddFile (DEVMAPS"data_se/pnames.lmp");
-	strcpy (basedefault,DEVDATA"default.cfg");
-	return;
-    }
+    // if (M_CheckParm ("-regdev"))
+    // {
+	// gamemode = registered;
+	// devparm = true;
+	// D_AddFile (DEVDATA"doom.wad");
+	// D_AddFile (DEVMAPS"data_se/texture1.lmp");
+	// D_AddFile (DEVMAPS"data_se/texture2.lmp");
+	// D_AddFile (DEVMAPS"data_se/pnames.lmp");
+	// strcpy (basedefault,DEVDATA"default.cfg");
+	// return;
+    // }
 
-    if (M_CheckParm ("-comdev"))
-    {
-	gamemode = commercial;
-	devparm = true;
-	/* I don't bother
-	if(plutonia)
-	    D_AddFile (DEVDATA"plutonia.wad");
-	else if(tnt)
-	    D_AddFile (DEVDATA"tnt.wad");
-	else*/
-	    D_AddFile (DEVDATA"doom2.wad");
+    // if (M_CheckParm ("-comdev"))
+    // {
+	// gamemode = commercial;
+	// devparm = true;
+	// /* I don't bother
+	// if(plutonia)
+	//     D_AddFile (DEVDATA"plutonia.wad");
+	// else if(tnt)
+	//     D_AddFile (DEVDATA"tnt.wad");
+	// else*/
+	//     D_AddFile (DEVDATA"doom2.wad");
 	    
-	D_AddFile (DEVMAPS"cdata/texture1.lmp");
-	D_AddFile (DEVMAPS"cdata/pnames.lmp");
-	strcpy (basedefault,DEVDATA"default.cfg");
-	return;
-    }
+	// D_AddFile (DEVMAPS"cdata/texture1.lmp");
+	// D_AddFile (DEVMAPS"cdata/pnames.lmp");
+	// strcpy (basedefault,DEVDATA"default.cfg");
+	// return;
+    // }
 
-	gamemode = commercial;
-	D_AddFile (doomwad); // filesystem doesn't exist, this is custom OS.
+	gamemode = retail;
+	D_AddFile ("doom.wad"); // filesystem doesn't exist, this is custom OS.
 
     // if ( !access (doom2fwad,R_OK) )
     // {
@@ -803,8 +808,12 @@ void D_DoomMain (void)
     char                    file[256];
 
     // FindResponseFile ();
+
+	printf( "DOOM version %d.%d\n", VERSION/100, VERSION%100 );
 	
     IdentifyVersion ();
+
+	printf( "Checking params\n");
 	
     // setbuf (stdout, NULL);
     modifiedgame = false;
@@ -873,7 +882,7 @@ void D_DoomMain (void)
 	break;
     }
     
-    // printf ("%s\n",title);
+    printf ("titleafter: %s\n",title);
 
     if (devparm)
 	// printf(D_DEVSTR);
@@ -915,6 +924,8 @@ void D_DoomMain (void)
     {
 	myargv[p][4] = 'p';     // big hack, change to -warp
 
+	printf("Loading map\n");
+
 	// Map name handling.
 	switch (gamemode )
 	{
@@ -923,8 +934,8 @@ void D_DoomMain (void)
 	  case registered:
 	    sprintf (file,"~"DEVMAPS"E%cM%c.wad",
 		     myargv[p+1][0], myargv[p+2][0]);
-	    // printf("Warping to Episode %s, Map %s.\n",
-		//    myargv[p+1],myargv[p+2]);
+	    printf("Warping to Episode %s, Map %s.\n",
+		   myargv[p+1],myargv[p+2]);
 	    break;
 	    
 	  case commercial:
@@ -938,6 +949,8 @@ void D_DoomMain (void)
 	}
 	D_AddFile (file);
     }
+
+	printf("Doing stuff\n");
 	
     p = M_CheckParm ("-file");
     if (p)
@@ -958,7 +971,7 @@ void D_DoomMain (void)
     {
 	sprintf (file,"%s.lmp", myargv[p+1]);
 	D_AddFile (file);
-	// printf("Playing demo %s.lmp.\n",myargv[p+1]);
+	printf("Playing demo %s.lmp.\n",myargv[p+1]);
     }
     
     // get skill / episode / map from parms
@@ -988,7 +1001,7 @@ void D_DoomMain (void)
     {
 	int     time;
 	time = atoi(myargv[p+1]);
-	// printf("Levels will end after %d minute",time);
+	printf("Levels will end after %d minute",time);
 	if (time>1)
 	    printf("s");
 	printf(".\n");
@@ -996,7 +1009,7 @@ void D_DoomMain (void)
 
     p = M_CheckParm ("-avg");
     if (p && p < myargc-1 && deathmatch)
-	// printf("Austin Virtual Gaming: Levels will end after 20 minutes\n");
+	printf("Austin Virtual Gaming: Levels will end after 20 minutes\n");
 
     p = M_CheckParm ("-warp");
     if (p && p < myargc-1)
@@ -1010,21 +1023,21 @@ void D_DoomMain (void)
 	}
 	autostart = true;
     }
-    
     // init subsystems
-    // printf ("V_Init: allocate screens.\n");
+    printf ("V_Init: allocate screens.\n");
     V_Init ();
 
-    // printf ("M_LoadDefaults: Load system defaults.\n");
+    printf ("M_LoadDefaults: Load system defaults.\n");
     M_LoadDefaults ();              // load before initing other systems
 
-    // printf ("Z_Init: Init zone memory allocation daemon. \n");
+    printf ("Z_Init: Init zone memory allocation daemon. \n");
     Z_Init ();
 
-    // printf ("W_Init: Init WADfiles.\n");
+    printf ("W_Init: Init WADfiles.\n");
     W_InitMultipleFiles (wadfiles);
     
 
+	printf("Checking IWAD validity\n");
     // Check for -file in shareware
     if (modifiedgame)
     {

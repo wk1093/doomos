@@ -162,7 +162,8 @@ M_ReadFile
 		
     // *buffer = buf;
     // return length;
-    panic("M_ReadFile not implemented");
+    // panic("M_ReadFile not implemented");
+    return 0;
 }
 
 

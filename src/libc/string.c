@@ -1,6 +1,6 @@
 #include "string.h"
-
 #include <stdarg.h>
+#include <stdio.h>
 
 void *memcpy(void *dst, const void *src, size_t n) {
     uint8_t *d = dst;
@@ -30,50 +30,6 @@ size_t strlen(const char *s) {
     return len;
 }
 
-void sprintf(char *buf, const char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    char *p = buf;
-    const char *f = fmt;
-
-    while(*f) {
-        if(*f == '%') {
-            f++;
-            if(*f == 'd') {
-                int val = va_arg(args, int);
-                char numbuf[12];
-                char *nump = numbuf + sizeof(numbuf) - 1;
-                *nump = '\0';
-                int is_negative = 0;
-                if(val < 0) {
-                    is_negative = 1;
-                    val = -val;
-                }
-                do {
-                    *(--nump) = '0' + (val % 10);
-                    val /= 10;
-                } while(val);
-                if(is_negative) {
-                    *(--nump) = '-';
-                }
-                while(*nump) {
-                    *p++ = *nump++;
-                }
-            } else if(*f == 's') {
-                const char *sval = va_arg(args, const char *);
-                while(*sval) {
-                    *p++ = *sval++;
-                }
-            }
-            f++;
-        } else {
-            *p++ = *f++;
-        }
-    }
-    *p = '\0';
-    va_end(args);
-}
-
 int atoi(const char *str) {
     int result = 0;
     int sign = 1;
@@ -101,23 +57,22 @@ void strcpy(char *dst, const char *src) {
     while((*dst++ = *src++));
     *dst = '\0';
 }
-
+// kernel is at 0x00100000, so this assumes the kernel is less than 16MB in size (which it is 13MB right now)
+// We are also in 32 bit, so we need to make sure we don't exceed 4GB (0xFFFFFFFF)
 #define MEMORY_LOCATION 0x1000000
 
 size_t current_pos = 0;
 
 void* malloc(size_t size) {
+    if (current_pos + size > 0xFFFFFFFF - MEMORY_LOCATION) {
+        printf("malloc: Out of memory!\n");
+        for(;;);
+        // Out of memory
+        return NULL;
+    }
     void *ptr = (void *)(MEMORY_LOCATION + current_pos);
     current_pos += size;
     return ptr;
-}
-
-void printf(const char *fmt, ...) {
-    // Dummy implementation: In a real kernel, this would output to console or serial port
-    va_list args;
-    va_start(args, fmt);
-    // For simplicity, we won't implement actual output here
-    va_end(args);
 }
 
 void fprintf(int fd, const char *fmt, ...) {
@@ -178,10 +133,6 @@ int strcasecmp(const char *s1, const char *s2) {
         s2++;
     }
     return (unsigned char)tolower(*s1) - (unsigned char)tolower(*s2);
-}
-
-int abs(int x) {
-    return (x < 0) ? -x : x;
 }
 
 void strncpy(char *dst, const char *src, size_t n) {

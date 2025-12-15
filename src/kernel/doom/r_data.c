@@ -48,6 +48,8 @@ rcsid[] = "$Id: r_data.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 
 #include "r_data.h"
 
+#include <stdio.h>
+
 //
 // Graphics.
 // DOOM graphics for walls and sprites
@@ -450,12 +452,16 @@ void R_InitTextures (void)
     name_p = names+4;
     patchlookup = alloca (nummappatches*sizeof(*patchlookup));
     
+    printf("Number of patches: %d\n", nummappatches);
+
     for (i=0 ; i<nummappatches ; i++)
     {
 	strncpy (name,name_p+i*8, 8);
 	patchlookup[i] = W_CheckNumForName (name);
     }
     Z_Free (names);
+
+    printf("Patch lookup table created\n");
     
     // Load the map texture definitions from textures.lmp.
     // The data is contained in one or two lumps,
@@ -464,12 +470,16 @@ void R_InitTextures (void)
     numtextures1 = LONG(*maptex);
     maxoff = W_LumpLength (W_GetNumForName ("TEXTURE1"));
     directory = maptex+1;
+
+    printf("Number of textures in TEXTURE1: %d\n", numtextures1);
 	
     if (W_CheckNumForName ("TEXTURE2") != -1)
     {
+        printf("TEXTURE2 found\n");
 	maptex2 = W_CacheLumpName ("TEXTURE2", PU_STATIC);
 	numtextures2 = LONG(*maptex2);
 	maxoff2 = W_LumpLength (W_GetNumForName ("TEXTURE2"));
+    // printf("Number of textures in TEXTURE2: %d\n", numtextures2);
     }
     else
     {
@@ -653,6 +663,7 @@ void R_InitColormaps (void)
 //
 void R_InitData (void)
 {
+    printf("R_InitData started\n");
     R_InitTextures ();
     printf ("\nInitTextures");
     R_InitFlats ();
