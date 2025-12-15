@@ -105,16 +105,37 @@ void fb_draw_hex(int x, int y, uint32_t value, uint32_t color) {
     fb_draw_string(x, y, hex_string, color); // White color
 }
 
+uint8_t fb_palette[256 * 3];
+
 void fb_draw_image() {
     // convert from X image format to framebuffer format
     // we cannot assume the X image format is 32bpp (because it isn't)
     // it uses a pallette index per byte, since we don't know the pallete (right now, TODO) we will just expand the bytes to 32bpp greyscale
     // this buffer is actually only 320x200, so we need to scale it up to framebuffer size (1024x768)
     // for now just double it, and deal with the rest later
+    // for(int y = 0; y < X_height; y++) {
+    //     for(int x = 0; x < X_width; x++) {
+    //         uint8_t index = ((uint8_t*)image->data)[y * X_width + x];
+    //         uint32_t color = (index << 16) | (index << 8) | index; // greyscale
+    //         // scale to framebuffer size
+    //         int fb_x = x * 2;
+    //         int fb_y = y * 2;
+    //         fb_putpixel(fb_x, fb_y, color);
+    //         fb_putpixel(fb_x + 1, fb_y, color);
+    //         fb_putpixel(fb_x, fb_y + 1, color);
+    //         fb_putpixel(fb_x + 1, fb_y + 1, color);
+
+    //     }
+    // }
+
+    // use palette
     for(int y = 0; y < X_height; y++) {
         for(int x = 0; x < X_width; x++) {
             uint8_t index = ((uint8_t*)image->data)[y * X_width + x];
-            uint32_t color = (index << 16) | (index << 8) | index; // greyscale
+            uint8_t r = fb_palette[index * 3 + 0];
+            uint8_t g = fb_palette[index * 3 + 1];
+            uint8_t b = fb_palette[index * 3 + 2];
+            uint32_t color = (r << 16) | (g << 8) | b;
             // scale to framebuffer size
             int fb_x = x * 2;
             int fb_y = y * 2;
@@ -122,8 +143,11 @@ void fb_draw_image() {
             fb_putpixel(fb_x + 1, fb_y, color);
             fb_putpixel(fb_x, fb_y + 1, color);
             fb_putpixel(fb_x + 1, fb_y + 1, color);
-
         }
     }
 
+}
+
+void fb_set_palette(uint8_t* palette) {
+    memcpy(fb_palette, palette, 256 * 3);
 }

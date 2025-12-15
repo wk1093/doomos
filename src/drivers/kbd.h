@@ -3,11 +3,11 @@
 #include <stdint.h>
 
 typedef enum {
-    KEY_NONE = 0,
-    KEY_W, KEY_A, KEY_S, KEY_D,
-    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT,
-    KEY_SPACE, KEY_ESC,
-    KEY_COUNT
+    KBD_NONE = 0,
+    KBD_W, KBD_A, KBD_S, KBD_D,
+    KBD_UP, KBD_DOWN, KBD_LEFT, KBD_RIGHT,
+    KBD_SPACE, KBD_ESC,
+    KBD_COUNT
 } Key;
 
 typedef struct {

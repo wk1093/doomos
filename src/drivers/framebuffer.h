@@ -43,3 +43,5 @@ extern FakeXImage* image;
 #define X_height 200
 
 void fb_draw_image();
+
+void fb_set_palette(uint8_t* palette);

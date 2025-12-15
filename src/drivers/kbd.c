@@ -46,20 +46,20 @@ Key scancode_to_key(uint8_t sc, bool *released) {
     sc &= 0x7F;
 
     switch(sc) {
-        case 0x11: return KEY_W;
-        case 0x1E: return KEY_A;
-        case 0x1F: return KEY_S;
-        case 0x20: return KEY_D;
+        case 0x11: return KBD_W;
+        case 0x1E: return KBD_A;
+        case 0x1F: return KBD_S;
+        case 0x20: return KBD_D;
 
-        case 0x48: return KEY_UP;
-        case 0x50: return KEY_DOWN;
-        case 0x4B: return KEY_LEFT;
-        case 0x4D: return KEY_RIGHT;
+        case 0x48: return KBD_UP;
+        case 0x50: return KBD_DOWN;
+        case 0x4B: return KBD_LEFT;
+        case 0x4D: return KBD_RIGHT;
 
-        case 0x39: return KEY_SPACE;
-        case 0x01: return KEY_ESC;
+        case 0x39: return KBD_SPACE;
+        case 0x01: return KBD_ESC;
 
-        default: return KEY_NONE;
+        default: return KBD_NONE;
     }
 }
 
@@ -71,7 +71,7 @@ void kbd_update() {
     bool released;
     Key k = scancode_to_key(sc, &released);
 
-    if(k != KEY_NONE) {
+    if(k != KBD_NONE) {
         queue_push(k, !released); // true = keydown, false = keyup
     }
 }

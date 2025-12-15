@@ -95,6 +95,8 @@ void sprintf(char *buf, const char *fmt, ...) {
 static int line_pos = 0;
 static int col_pos = 0;
 
+static const int col_offset = 640; // offset from left edge
+
 void printf(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -200,11 +202,11 @@ void printf(const char *fmt, ...) {
         } else if (*bp == '\r') {
             col_pos = 0;
         } else {
-            fb_draw_char(10 + col_pos * 8, line_pos * 10, *bp, 0x00FFFFFF);
+            fb_draw_char(col_offset + col_pos * 8, line_pos * 10, *bp, 0x00FFFFFF);
             col_pos += 1;
         }
         bp++;
-        if (col_pos * 8 >= FB_WIDTH) {
+        if (col_pos * 8 + col_offset >= FB_WIDTH) {
             col_pos = 0;
             line_pos += 1;
         }

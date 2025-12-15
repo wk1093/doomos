@@ -41,6 +41,8 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #endif
 
 
+#include <kbd.h>
+
 #include "doomdef.h"
 #include "doomstat.h"
 
@@ -372,7 +374,7 @@ void D_DoomLoop (void)
     while (1)
     {
 	// frame syncronous IO operations
-	I_StartFrame ();                
+	I_StartFrame ();              
 	
 	// process one or more tics
 	if (singletics)

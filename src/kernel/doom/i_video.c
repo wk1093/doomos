@@ -82,8 +82,32 @@ static int	multiply=1;
 //  Translates the key currently in X_event
 //
 
-int xlatekey(void)
+int keyconv(Key key)
 {
+	switch (key) {
+		case KBD_LEFT:
+			return KEY_LEFTARROW;
+		case KBD_RIGHT:
+			return KEY_RIGHTARROW;
+		case KBD_DOWN:
+			return KEY_DOWNARROW;
+		case KBD_UP:
+			return KEY_UPARROW;
+		case KBD_ESC:
+			return KEY_ESCAPE;
+		case KBD_SPACE:
+			return KEY_ENTER;
+		case KBD_W:
+			return 'w';
+		case KBD_A:
+			return 'a';
+		case KBD_S:
+			return 's';
+		case KBD_D:
+			return 'd';
+		default:
+			return 0;
+	}
 
     // int rc;
 
@@ -183,13 +207,13 @@ void I_GetEvent(void)
     if (ev.pressed)
     {
 	event.type = ev_keydown;
-	event.data1 = xlatekey();
+	event.data1 = keyconv(ev.key);
 	D_PostEvent(&event);
 	}
 	else
 	{
 	event.type = ev_keyup;
-	event.data1 = xlatekey();
+	event.data1 = keyconv(ev.key);
 	D_PostEvent(&event);
 	}
 
@@ -200,7 +224,7 @@ void I_GetEvent(void)
 //
 void I_StartTic (void)
 {
-
+	kbd_update();
     while (kbd_event_pending())
 	I_GetEvent();
 
@@ -424,6 +448,7 @@ void I_ReadScreen (byte* scr)
 //
 void I_SetPalette (byte* palette)
 {
+	fb_set_palette(palette);
     // UploadNewPalette(X_cmap, palette);
 }
 
