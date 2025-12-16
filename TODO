@@ -1,0 +1,3 @@
+Implement audio
+Full scaling for game
+Fix timing to use PIT instead of loop delay
