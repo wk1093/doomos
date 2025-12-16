@@ -31,6 +31,7 @@ uint32_t* fb_backbuffer();
 
 void fb_draw_char(int x, int y, char c, uint32_t color);
 void fb_draw_string(int x, int y, const char* str, uint32_t color);
+void fb_draw_string_bg(int x, int y, const char* str, uint32_t fgcolor, uint32_t bgcolor);
 void fb_draw_hex(int x, int y, uint32_t value, uint32_t color);
 
 typedef struct FakeXImage {

@@ -243,7 +243,7 @@ default_t	defaults[] =
     {"show_messages",&showMessages, 1},
     
 
-#ifdef NORMALUNIX
+// #ifdef NORMALUNIX
     {"key_right",&key_right, KEY_RIGHTARROW},
     {"key_left",&key_left, KEY_LEFTARROW},
     {"key_up",&key_up, KEY_UPARROW},
@@ -257,12 +257,12 @@ default_t	defaults[] =
     {"key_speed",&key_speed, KEY_RSHIFT},
 
 // UNIX hack, to be removed. 
-#ifdef SNDSERV
-    {"sndserver", (int *) &sndserver_filename, (int) "sndserver"},
-    {"mb_used", &mb_used, 2},
-#endif
+// #ifdef SNDSERV
+//     {"sndserver", (int *) &sndserver_filename, (int) "sndserver"},
+//     {"mb_used", &mb_used, 2},
+// #endif
     
-#endif
+// #endif
 
 #ifdef LINUX
     {"mousedev", (int*)&mousedev, (int)"/dev/ttyS0"},
@@ -343,7 +343,7 @@ extern byte	scantokey[128];
 
 void M_LoadDefaults (void)
 {
-    // int		i;
+    int		i;
     // int		len;
     // FILE*	f;
     // char	def[80];
@@ -353,9 +353,9 @@ void M_LoadDefaults (void)
     // boolean	isstring;
     
     // // set everything to base values
-    // numdefaults = sizeof(defaults)/sizeof(defaults[0]);
-    // for (i=0 ; i<numdefaults ; i++)
-	// *defaults[i].location = defaults[i].defaultvalue;
+    numdefaults = sizeof(defaults)/sizeof(defaults[0]);
+    for (i=0 ; i<numdefaults ; i++)
+	*defaults[i].location = defaults[i].defaultvalue;
     
     // // check for a custom default file
     // i = M_CheckParm ("-config");

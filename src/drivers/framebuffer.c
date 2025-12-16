@@ -95,6 +95,16 @@ void fb_draw_string(int x, int y, const char* str, uint32_t color) {
     }
 }
 
+void fb_draw_string_bg(int x, int y, const char *str, uint32_t fgcolor, uint32_t bgcolor) {
+    while (*str) {
+        // Draw background rectangle for character
+        fb_rect(x, y, 8, 8, bgcolor);
+        // Draw character on top
+        fb_draw_char(x, y, *str++, fgcolor);
+        x += 8; // Move to the next character position
+    }
+}
+
 void fb_draw_hex(int x, int y, uint32_t value, uint32_t color) {
     const char* hex_chars = "0123456789ABCDEF";
     char hex_string[9]; // 8 digits + null terminator

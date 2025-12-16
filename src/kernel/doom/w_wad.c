@@ -140,12 +140,17 @@ char*			reloadname;
 
 extern unsigned char DOOM_WAD[];
 extern unsigned int DOOM_WAD_len;
+// extern unsigned char DOOM1_WAD[];
+// extern unsigned int DOOM1_WAD_len;
+
+unsigned char* current_wad;
+unsigned int current_wad_len;
 
 int wadPosition = 0;
 
 void wadseek(int position)
 {
-    if (position < 0 || position >= DOOM_WAD_len)
+    if (position < 0 || position >= current_wad_len)
     {
         I_Error("wadseek: invalid position");
     }
@@ -155,12 +160,12 @@ void wadseek(int position)
 
 int wadread(void* buffer, int length)
 {
-    if (wadPosition + length > DOOM_WAD_len)
+    if (wadPosition + length > current_wad_len)
     {
         I_Error("wadread: read beyond end of WAD");
     }
     
-    memcpy(buffer, &DOOM_WAD[wadPosition], length);
+    memcpy(buffer, &current_wad[wadPosition], length);
     wadPosition += length;
     return length;
 }
@@ -178,8 +183,6 @@ void W_AddFile (char *filename)
     filelump_t		singleinfo;
     int			storehandle;
     
-    // open the file and add to directory
-    wadseek(0);
     // handle reload indicator.
     if (filename[0] == '~')
     {
@@ -190,7 +193,23 @@ void W_AddFile (char *filename)
 	
 
     printf (" adding %s\n",filename);
+    if (strcmp (filename, "doom.wad") == 0)
+    {
+        current_wad = DOOM_WAD;
+        current_wad_len = DOOM_WAD_len;
+    }
+    else if (strcmp (filename, "doom1.wad") == 0)
+    {
+        // current_wad = DOOM1_WAD;
+        // current_wad_len = DOOM1_WAD_len;
+        I_Error("W_AddFile: doom1.wad not supported in this build");
+    }
+    else
+    {
+        I_Error("W_AddFile: File %s not found", filename);
+    }
     startlump = numlumps;
+    wadseek(0);
 	
     if (strcmpi (filename+strlen(filename)-3 , "wad" ) )
     {
@@ -198,7 +217,7 @@ void W_AddFile (char *filename)
 	// single lump file
 	fileinfo = &singleinfo;
 	singleinfo.filepos = 0;
-	singleinfo.size = LONG(DOOM_WAD_len);
+	singleinfo.size = LONG(current_wad_len);
 	ExtractFileBase (filename, singleinfo.name);
 	numlumps++;
     }

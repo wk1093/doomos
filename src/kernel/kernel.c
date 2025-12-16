@@ -2,12 +2,16 @@
 
 #include "framebuffer.h"
 #include "kbd.h"
+#include "mouse.h"
+#include "pit.h"
 #include "cpu/isr.h"
 #include "cpu/idt.h"
 #include "cpu/gdt.h"
 #include "cpu/pic.h"
 #include <string.h>
 #include <stdio.h>
+
+#include "doom/doomdef.h"
 
 int main(char** argv, int argc); // Forward declaration of main function
 
@@ -75,64 +79,23 @@ void kernel_main(uint32_t mb_magic, uint32_t mb_info_ptr) {
     fb_init(FB_DOUBLE_BUFFER, (void*)(uintptr_t)fb_addr);
 
 
-    // some random code
-    int i = 0;
-    int* p = &i;
-    *p = 42;
-
     fb_clear(0x00111111);
 
     fb_swap();
 
+    pit_init();
+
 
     printf("Framebuffer initialized: %ux%u, %u bpp\n", fb_width, fb_height, fb_bpp);
 
-    // char* args[2] = { "-wad", "doom.wad" };
+    mouse_init();
+
+    // // char* args[2] = { "-wad", "doom.wad" };
     main(NULL, 0);
-
-    // fb_clear(0x00111111); // Dark gray background
-    // fb_draw_string(50, 50, "Welcome to DoomOS!", 0x00FFFFFF); // White text
-
-    // fb_swap();
-
-    // int px = fb_width / 2;
-    // int py = fb_height / 2;
-
-    // const int box_size = 50;
-
-    // while (1) {
-    //     kbd_update();
-
-    //     kbd_event_t ev;
-    //     while (kbd_pop_event(&ev)) {
-    //         if (ev.pressed) switch (ev.key) {
-    //             case KEY_W:
-    //             case KEY_UP: py -= 2; break;
-    //             case KEY_S:
-    //             case KEY_DOWN: py += 2; break;
-    //             case KEY_A:
-    //             case KEY_LEFT: px -= 2; break;
-    //             case KEY_D:
-    //             case KEY_RIGHT: px += 2; break;
-
-    //             default: break;
-    //         }
-
-    //         if (px < 0) px = 0;
-    //         if (py < 0) py = 0;
-    //         if (px >= (int)fb_width) px = fb_width - box_size;
-    //         if (py >= (int)fb_height) py = fb_height - box_size;
-
-    //         fb_clear(0x00111111); // Dark gray background
-    //         fb_rect(px, py, box_size, box_size, 0x00FF0000); // Red box
-    //         fb_swap();
-
-    //     }
-    // }
-
     
     // Halt the CPU indefinitely
     while(1) {
         asm("hlt");
+        // printf("pit tics: %d", pit_get_tics());
     }
 }

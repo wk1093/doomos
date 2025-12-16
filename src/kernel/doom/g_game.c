@@ -632,6 +632,7 @@ void G_Ticker (void)
 	    G_DoSaveGame (); 
 	    break; 
 	  case ga_playdemo: 
+        printf("Trying to play demo\n");
 	    G_DoPlayDemo (); 
 	    break; 
 	  case ga_completed: 
@@ -1591,7 +1592,7 @@ void G_DoPlayDemo (void)
     demobuffer = demo_p = W_CacheLumpName (defdemoname, PU_STATIC); 
     if ( *demo_p++ != VERSION)
     {
-      printf("Demo is from a different game version!\n");
+      printf("Demo is from a different game version: %s %d\n", defdemoname, *(demo_p-1));
       gameaction = ga_nothing;
       return;
     }

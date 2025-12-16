@@ -220,6 +220,54 @@ void printf(const char *fmt, ...) {
     fb_swap();
 }
 
+void printf_dbg(int x, int y, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    
+    const char *f = fmt;
+    char buffer[1024];
+    char *p = buffer;
+    while(*f) {
+        if(*f == '%') {
+            f++;
+            if(*f == 'd' || *f == 'i') {
+                int val = va_arg(args, int);
+                char numbuf[12];
+                char *nump = numbuf + sizeof(numbuf) - 1;
+                *nump = '\0';
+                int is_negative = 0;
+                if(val < 0) {
+                    is_negative = 1;
+                    val = -val;
+                }
+                do {
+                    *(--nump) = '0' + (val % 10);
+                    val /= 10;
+                } while(val);
+                if(is_negative) {
+                    *(--nump) = '-';
+                }
+                while(*nump) {
+                    *p++ = *nump++;
+                }
+            } else if(*f == 's') {
+                const char *sval = va_arg(args, const char *);
+                while(*sval) {
+                    *p++ = *sval++;
+                }
+            }
+            f++;
+        } else {
+            *p++ = *f++;
+        }
+    }
+    *p = '\0';
+
+    fb_draw_string_bg(x, y, buffer, 0x00FF00FF, 0x00000000); // Magenta for debug
+    va_end(args);
+    fb_swap();
+}
+
 void vprintf(const char *fmt, va_list args) {
     char buffer[1024];
     char *p = buffer;

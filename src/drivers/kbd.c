@@ -1,5 +1,7 @@
 #include "kbd.h"
 
+#include <stdio.h>
+
 #define KBD_DATA   0x60
 #define KBD_STATUS 0x64
 
@@ -40,6 +42,8 @@ static inline uint8_t kbd_read_scancode() {
     return inb(KBD_DATA);
 }
 
+static bool e0_prefix = false;
+
 // ---------- Scancode → Key ----------
 Key scancode_to_key(uint8_t sc, bool *released) {
     *released = sc & 0x80;
@@ -59,22 +63,53 @@ Key scancode_to_key(uint8_t sc, bool *released) {
         case 0x39: return KBD_SPACE;
         case 0x01: return KBD_ESC;
 
+        case 0x1C: return KBD_ENTER;
+        case 0x0F: return KBD_TAB;
+
+        case 0x38: return KBD_LALT;
+        case 0xB8: return KBD_RALT;
+        case 0x1D: return KBD_LCTRL;
+        case 0x9D: return KBD_RCTRL;
+
+        case 0x2A:
+        case 0x36: return KBD_SHIFT;
+
         default: return KBD_NONE;
     }
 }
 
-// ---------- Process + push Doom-style events ----------
-void kbd_update() {
-    if(!kbd_available()) return;
 
-    uint8_t sc = kbd_read_scancode();
-    bool released;
-    Key k = scancode_to_key(sc, &released);
 
-    if(k != KBD_NONE) {
-        queue_push(k, !released); // true = keydown, false = keyup
+void kbd_handle_byte(uint8_t sc) {
+    if (sc == 0xE0) {
+        e0_prefix = true;
+        return;
+    }
+
+    bool released = sc & 0x80;
+
+    Key k = KBD_NONE;
+
+    if (e0_prefix) {
+        sc &= 0x7F;
+        // Extended keys
+        switch (sc) {
+            case 0x48: k = KBD_UP;    break;
+            case 0x50: k = KBD_DOWN;  break;
+            case 0x4B: k = KBD_LEFT;  break;
+            case 0x4D: k = KBD_RIGHT; break;
+        }
+        e0_prefix = false;
+    } else {
+        // Normal keys
+        k = scancode_to_key(sc, &released);
+    }
+
+    if (k != KBD_NONE) {
+        queue_push(k, !released);
     }
 }
+
 
 bool kbd_event_pending() {
     return queue_head != queue_tail;

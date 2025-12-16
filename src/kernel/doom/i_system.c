@@ -24,6 +24,8 @@ static const char
 rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 
+#include <pit.h>
+
 // #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -85,23 +87,28 @@ byte* I_ZoneBase (int*	size)
 // I_GetTime
 // returns time in 1/70th second tics
 //
-static int temp_time_var = 0;
-int  I_GetTime (void)
-{
-    // struct timeval	tp;
-    // struct timezone	tzp;
-    // int			newtics;
-    // static int		basetime=0;
+// int  I_GetTime (void)
+// {
+//     // struct timeval	tp;
+//     // struct timezone	tzp;
+//     // int			newtics;
+//     // static int		basetime=0;
   
-    // gettimeofday(&tp, &tzp);
-    // if (!basetime)
-	// basetime = tp.tv_sec;
-    // newtics = (tp.tv_sec-basetime)*TICRATE + tp.tv_usec*TICRATE/1000000;
-    // return newtics;
+//     // gettimeofday(&tp, &tzp);
+//     // if (!basetime)
+// 	// basetime = tp.tv_sec;
+//     // newtics = (tp.tv_sec-basetime)*TICRATE + tp.tv_usec*TICRATE/1000000;
+//     // return newtics;
+//     return pit_get_tics();
+// }
+
+#define CPU_DELAY 10000000
+static int temp_time_var = 0;
+
+int I_GetTime(void) {
+    for (volatile int i = 0; i < CPU_DELAY; i++); // crude delay
     return temp_time_var++;
 }
-
-
 
 //
 // I_Init
@@ -174,7 +181,7 @@ void I_Error (char *error, ...)
 
     // fflush( stderr );
 
-    for(;;);
+    // for(;;);
 
     // Shutdown. Here might be other errors.
     if (demorecording)

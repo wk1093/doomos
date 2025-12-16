@@ -42,6 +42,7 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 
 
 #include <kbd.h>
+#include <framebuffer.h>
 
 #include "doomdef.h"
 #include "doomstat.h"
@@ -89,7 +90,7 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 // Manages timing and IO,
 //  calls all ?_Responder, ?_Ticker, and ?_Drawer,
 //  calls I_GetTime, I_StartFrame, and I_StartTic
-//
+//https://osci-render.com/sosci/
 void D_DoomLoop (void);
 
 
@@ -103,7 +104,7 @@ boolean         fastparm;	// checkparm of -fast
 
 boolean         drone;
 
-boolean		singletics = true; // debug flag to cancel adaptiveness
+boolean		singletics = false; // debug flag to cancel adaptiveness
 
 
 
@@ -391,10 +392,17 @@ void D_DoomLoop (void)
 	}
 	else
 	{
-		printf("Multi tic mode\n");
-		for (;;);
 	    TryRunTics (); // will run at least one tic
 	}
+
+	// print status information so we can debug
+	printf_dbg(0, 400, "paused: %d  playerstate: %d  playerpos: (%d,%d,%d)  health: %d   ",
+		   paused,
+		   players[consoleplayer].playerstate,
+		   (int)players[consoleplayer].mo->x,
+		   (int)players[consoleplayer].mo->y,
+		   (int)players[consoleplayer].mo->z,
+		   players[consoleplayer].health);
 		
 	S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
 	// Update display, next frame, with current state.
@@ -663,6 +671,7 @@ void IdentifyVersion (void)
 	// return;
     // }
 
+	// I have a WAD embedded thjat is Doom Ultimate.
 	gamemode = retail;
 	D_AddFile ("doom.wad"); // filesystem doesn't exist, this is custom OS.
 
@@ -884,7 +893,7 @@ void D_DoomMain (void)
 	break;
     }
     
-    printf ("titleafter: %s\n",title);
+    printf ("%s\n",title);
 
     if (devparm)
 	// printf(D_DEVSTR);

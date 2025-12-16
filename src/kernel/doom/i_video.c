@@ -25,6 +25,7 @@ static const char
 rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include <kbd.h>
+#include <mouse.h>
 #include <framebuffer.h>
 #include <stdio.h>
 
@@ -95,7 +96,7 @@ int keyconv(Key key)
 			return KEY_UPARROW;
 		case KBD_ESC:
 			return KEY_ESCAPE;
-		case KBD_SPACE:
+		case KBD_ENTER:
 			return KEY_ENTER;
 		case KBD_W:
 			return 'w';
@@ -105,6 +106,18 @@ int keyconv(Key key)
 			return 's';
 		case KBD_D:
 			return 'd';
+		case KBD_SPACE:
+			return ' ';
+		case KBD_LALT:
+		case KBD_RALT:
+			return KEY_RALT;
+		case KBD_LCTRL:
+		case KBD_RCTRL:
+			return KEY_RCTRL;
+		case KBD_SHIFT:
+			return KEY_RSHIFT;
+		case KBD_TAB:
+			return KEY_TAB;
 		default:
 			return 0;
 	}
@@ -202,19 +215,32 @@ void I_GetEvent(void)
     event_t event;
 
     // put event-grabbing stuff in here
-    kbd_event_t ev;
-	kbd_pop_event(&ev);
-    if (ev.pressed)
-    {
-	event.type = ev_keydown;
-	event.data1 = keyconv(ev.key);
-	D_PostEvent(&event);
+	if (kbd_event_pending()) {
+		kbd_event_t ev;
+		kbd_pop_event(&ev);
+		if (ev.pressed)
+		{
+		event.type = ev_keydown;
+		event.data1 = keyconv(ev.key);
+		D_PostEvent(&event);
+		}
+		else
+		{
+		event.type = ev_keyup;
+		event.data1 = keyconv(ev.key);
+		D_PostEvent(&event);
+		}
 	}
-	else
-	{
-	event.type = ev_keyup;
-	event.data1 = keyconv(ev.key);
-	D_PostEvent(&event);
+	if (mouse_event_pending()) {
+		mouse_event_t me;
+		mouse_pop_event(&me);
+		if (me.dx || me.dy || me.buttons != 0) {
+			event.type = ev_mouse;
+			event.data1 = me.buttons;
+			event.data2 = me.dx*10;
+			event.data3 = -me.dy*10;
+			D_PostEvent(&event);
+		}
 	}
 
 }
@@ -224,8 +250,11 @@ void I_GetEvent(void)
 //
 void I_StartTic (void)
 {
-	kbd_update();
+	ps2_update();
     while (kbd_event_pending())
+	I_GetEvent();
+
+	while (mouse_event_pending())
 	I_GetEvent();
 
     // Warp the pointer back to the middle of the window
